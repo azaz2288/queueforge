@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.venv/
+data/
+build/
+dist/
+node_modules/
+*.egg-info/
+*.tsbuildinfo
+.env*
+verification/

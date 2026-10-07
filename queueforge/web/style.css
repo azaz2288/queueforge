@@ -1,0 +1,209 @@
+:root {
+  font:
+    15px "Segoe UI",
+    "Microsoft YaHei",
+    sans-serif;
+  color: #d7e4ec;
+  background: #0f1926;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  display: flex;
+}
+aside {
+  width: 220px;
+  padding: 28px 20px;
+  background: #111e2e;
+  position: fixed;
+  inset: 0 auto 0 0;
+  border-right: 1px solid #283748;
+}
+aside h2 {
+  font-size: 21px;
+  color: #e0b777;
+}
+aside p,
+.eyebrow {
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: #809bad;
+}
+.nav {
+  padding: 15px;
+  margin-top: 50px;
+  background: #243950;
+  border-radius: 8px;
+}
+.note {
+  margin-top: 60px;
+  line-height: 2.5;
+  color: #8aa0b1;
+}
+main {
+  margin-left: 220px;
+  width: calc(100% - 220px);
+  padding: 40px;
+  max-width: 1450px;
+}
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+h1 {
+  font-size: 40px;
+  line-height: 1.35;
+  margin: 20px 0 30px;
+}
+h2 {
+  font-size: 20px;
+}
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  padding: 11px;
+  border-radius: 7px;
+  border: 1px solid #38516a;
+  background: #152739;
+  color: #dfeaf1;
+}
+button {
+  background: #dfb46e;
+  color: #152333;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+}
+button:hover {
+  background: #edc78b;
+}
+button:disabled {
+  opacity: 0.5;
+}
+button:focus-visible,
+input:focus,
+textarea:focus,
+select:focus {
+  outline: 2px solid #dfb46e;
+}
+.panel {
+  background: #162638;
+  border: 1px solid #2d4155;
+  padding: 25px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+.fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+label {
+  display: grid;
+  gap: 9px;
+  margin-bottom: 16px;
+}
+textarea {
+  resize: vertical;
+}
+.actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+  margin-bottom: 25px;
+}
+.metric {
+  padding: 20px;
+  background: #1d3044;
+  border: 1px solid #334b60;
+  border-radius: 10px;
+}
+.metric strong {
+  font-size: 32px;
+  display: block;
+  color: #e2be85;
+}
+.metric span {
+  color: #93adbf;
+}
+.table-wrap {
+  overflow: auto;
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+th,
+td {
+  padding: 14px;
+  text-align: left;
+  border-bottom: 1px solid #304255;
+  max-width: 320px;
+  overflow-wrap: anywhere;
+}
+td button {
+  font-size: 12px;
+  margin: 4px;
+}
+p,
+footer {
+  line-height: 1.8;
+  color: #8fa8ba;
+}
+pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 13px;
+}
+#status {
+  color: #e5bd7f;
+}
+footer {
+  padding: 15px;
+}
+@media (max-width: 850px) {
+  aside {
+    position: static;
+    width: 100%;
+    padding: 15px;
+  }
+  .nav,
+  .note,
+  aside p {
+    display: none;
+  }
+  body {
+    display: block;
+  }
+  main {
+    margin: 0;
+    width: 100%;
+    padding: 20px;
+  }
+  .fields {
+    grid-template-columns: 1fr;
+  }
+  .metrics {
+    grid-template-columns: 1fr 1fr;
+  }
+  h1 {
+    font-size: 30px;
+  }
+  header {
+    align-items: flex-start;
+    gap: 15px;
+  }
+  .panel {
+    padding: 17px;
+  }
+}

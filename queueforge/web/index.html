@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>QueueForge · 可靠任务队列</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <aside>
+      <h2>▦ QueueForge</h2>
+      <p>DURABLE WORKSPACE</p>
+      <div class="nav">● 任务控制台</div>
+      <div class="note">
+        事务领取<br />租约与栅栏<br />指数退避<br />持久事件记录
+      </div>
+    </aside>
+    <main>
+      <header>
+        <div>
+          <p class="eyebrow">OPERATIONS / LOCAL</p>
+          <h1>任务可以重试，<br />结果不能乱写。</h1>
+        </div>
+        <button id="refresh">刷新状态</button>
+      </header>
+      <div id="metrics" class="metrics"></div>
+      <section class="panel">
+        <h2>提交任务</h2>
+        <form id="form">
+          <div class="fields">
+            <label
+              >幂等键<input
+                id="key"
+                required
+                maxlength="100"
+                placeholder="report-2026-10-07" /></label
+            ><label
+              >任务类型<select id="task">
+                <option value="text_stats">文本统计</option>
+                <option value="sha256">SHA-256 摘要</option>
+              </select></label
+            >
+          </div>
+          <label
+            >输入文本<textarea id="text" rows="4" required>
+可靠性不是一次成功，而是失败后仍能正确恢复。</textarea
+            >
+          </label>
+          <div class="actions">
+            <button type="submit">提交到持久队列</button
+            ><button type="button" id="work">执行一个待处理任务</button>
+          </div>
+        </form>
+        <p id="status" role="status"></p>
+      </section>
+      <section class="panel">
+        <h2>任务记录</h2>
+        <p>
+          页面显示最近100条。独立 worker
+          可持续消费；此页面按钮执行一个真实领取/计算/提交周期。
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>任务 / 幂等键</th>
+                <th>状态</th>
+                <th>尝试次数</th>
+                <th>结果 / 错误</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="jobs"></tbody>
+          </table>
+        </div>
+      </section>
+      <section class="panel">
+        <h2>状态事件</h2>
+        <p>选择任务查看领取、失败、到期回收、完成等记录。</p>
+        <pre id="events">尚未选择任务</pre>
+      </section>
+      <footer>
+        至少一次执行语义 · 栅栏保护队列结果提交，无法保证外部副作用恰好一次
+      </footer>
+    </main>
+    <script src="/app.js" defer></script>
+  </body>
+</html>
