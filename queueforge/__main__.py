@@ -12,6 +12,8 @@ def main():
     worker = sub.add_parser("worker")
     worker.add_argument("--name", default="worker-1")
     worker.add_argument("--once", action="store_true")
+    worker.add_argument("--lease-seconds", type=float, default=30)
+    worker.add_argument("--heartbeat-interval", type=float, default=None)
     server = sub.add_parser("serve")
     server.add_argument("--port", type=int, default=8781)
     submit = sub.add_parser("submit")
@@ -26,7 +28,10 @@ def main():
     if args.command == "worker":
         try:
             while True:
-                active = work_once(queue, args.name)
+                active = work_once(
+                    queue, args.name, lease_seconds=args.lease_seconds,
+                    heartbeat_interval=args.heartbeat_interval,
+                )
                 if args.once:
                     break
                 if not active:

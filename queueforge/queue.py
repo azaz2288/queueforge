@@ -4,6 +4,7 @@ import hashlib
 import json
 import math
 import sqlite3
+import threading
 import time
 import uuid
 from contextlib import closing, contextmanager
@@ -111,7 +112,7 @@ class Queue:
         if not isinstance(worker, str) or not 1 <= len(worker) <= 100:
             raise ValueError("Worker name required")
         if (
-            not isinstance(lease_seconds, (int, float))
+            type(lease_seconds) not in (int, float)
             or not math.isfinite(lease_seconds)
             or not 0.1 <= lease_seconds <= 300
         ):
@@ -158,7 +159,7 @@ class Queue:
 
     def heartbeat(self, id, token, lease_seconds=30):
         if (
-            not isinstance(lease_seconds, (int, float))
+            type(lease_seconds) not in (int, float)
             or not math.isfinite(lease_seconds)
             or not 0.1 <= lease_seconds <= 300
         ):
@@ -272,16 +273,66 @@ def execute(job):
     raise ValueError("Unknown task")
 
 
-def work_once(queue, worker):
-    job = queue.claim(worker)
+def work_once(queue, worker, *, lease_seconds=30, heartbeat_interval=None):
+    """Run a trusted built-in task, renewing its lease in a separate thread.
+
+    Renewal failure refuses both success and failure publication; recovery is
+    by lease expiry. This cannot cancel a handler or fence external effects.
+    """
+    if (
+        type(lease_seconds) not in (int, float)
+        or not math.isfinite(lease_seconds)
+        or not .1 <= lease_seconds <= 300
+    ):
+        raise ValueError("Lease .1–300 seconds")
+    interval = lease_seconds / 3 if heartbeat_interval is None else heartbeat_interval
+    if (
+        type(interval) not in (int, float)
+        or not math.isfinite(interval)
+        or not 0 < interval < lease_seconds
+    ):
+        raise ValueError("Heartbeat interval must be positive and below lease duration")
+    job = queue.claim(worker, lease_seconds)
     if not job:
         return False
+    stop = threading.Event()
+    lost = threading.Event()
+
+    def renew():
+        while not stop.wait(interval):
+            try:
+                queue.heartbeat(job["id"], job["token"], lease_seconds)
+            except Exception:
+                # Do not publish a result after an uncertain storage operation
+                # or loss of the fenced token. No secrets/payload in messages.
+                lost.set()
+                return
+
+    renewal = threading.Thread(
+        target=renew, name="queueforge-heartbeat-" + job["id"], daemon=True
+    )
+
+    def shutdown():
+        stop.set()
+        renewal.join(timeout=11)
+        if renewal.is_alive():
+            lost.set()
+            raise RuntimeError("Heartbeat did not stop within the shutdown budget")
+
+    renewal.start()
     try:
-        result = execute(job)
+        try:
+            result = execute(job)
+        finally:
+            shutdown()
+        if lost.is_set():
+            return True
         queue.finish(job["id"], job["token"], result)
     except Conflict:
         pass  # Another lease owns the state; never write stale output.
     except Exception as exc:
+        if lost.is_set():
+            return True
         try:
             queue.fail(job["id"], job["token"], type(exc).__name__ + ": " + str(exc))
         except Conflict:

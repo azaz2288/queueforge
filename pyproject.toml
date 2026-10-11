@@ -3,7 +3,7 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 [project]
 name = "queueforge"
-version = "0.1.0"
+version = "0.2.0"
 description = "为本机后台计算提供可恢复任务状态：幂等提交、并发领取、租约过期重领、token栅栏、失败退避、死信重试与事件记录"
 requires-python = ">=3.12"
 readme = "README.md"
